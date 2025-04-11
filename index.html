@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequential Image Viewer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Image Viewer</h1>
+
+    <div class="image-container">
+        <p>Image No.: <span id="image-sequence">1</span> of 256</p>
+        <img id="current-image" src="" alt="Image Loading...">
+        <p>Current Image Code: <span id="image-code-display"></span></p>
+    </div>
+
+    <!-- Moved Nav buttons here, separate from Yes/No -->
+    <div class="navigation-controls">
+        <button id="prev-button">Previous Image</button>
+        <button id="next-button">Next Image</button>
+    </div>
+
+    <div class="controls">
+        <button id="yes-button">Yes (Add Code & Next)</button> <!-- Clarified Yes action -->
+        <button id="no-button">No (Skip & Next)</button>     <!-- Clarified No action -->
+    </div>
+
+    <div class="selected-codes">
+        <label for="selected-codes-textarea">Selected Codes:</label>
+        <textarea id="selected-codes-textarea" rows="5" placeholder="Selected image codes (e.g., 01-ABC-123) will appear here..."></textarea>
+        <div class="action-buttons">
+            <!-- زر التراجع تم حذفه -->
+            <button id="copy-button">Copy Codes</button>
+            <button id="download-txt-button">Download as TXT</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

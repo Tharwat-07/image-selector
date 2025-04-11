@@ -1,0 +1,113 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+}
+
+.image-container {
+    margin-bottom: 15px; /* Reduced bottom margin */
+    text-align: center;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 300px;
+}
+
+#current-image {
+    max-width: 100%;
+    max-height: 400px;
+    display: block;
+    margin: 10px auto;
+    border: 1px solid #ccc;
+}
+
+#image-sequence, #image-code-display {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Container for Nav buttons */
+.navigation-controls {
+    margin-bottom: 15px; /* Space below nav buttons */
+    text-align: center;
+}
+
+.controls, .action-buttons {
+    margin-top: 0; /* Removed top margin from .controls */
+    text-align: center;
+}
+
+/* Shared button styles */
+.navigation-controls button,
+.controls button,
+.action-buttons button {
+    padding: 10px 15px;
+    font-size: 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    transition: background-color 0.3s ease;
+    min-width: 120px;
+}
+
+/* Style for disabled state */
+.navigation-controls button:disabled,
+.controls button:disabled,
+.action-buttons button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+
+/* Specific button colors */
+#prev-button, #next-button { background-color: #17a2b8; } /* Teal/Info */
+#prev-button:hover:not(:disabled),
+#next-button:hover:not(:disabled) { background-color: #138496; }
+
+#yes-button { background-color: #28a745; } /* Green */
+#yes-button:hover:not(:disabled) { background-color: #218838; }
+#no-button { background-color: #dc3545; } /* Red */
+#no-button:hover:not(:disabled) { background-color: #c82333; }
+
+/* #undo-button style removed */
+
+#copy-button { background-color: #007bff; } /* Blue/Primary */
+#copy-button:hover:not(:disabled) { background-color: #0056b3; }
+#download-txt-button { background-color: #6c757d; } /* Gray/Secondary */
+#download-txt-button:hover:not(:disabled) { background-color: #5a6268; }
+
+
+.selected-codes {
+    margin-top: 20px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.selected-codes label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+#selected-codes-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-family: monospace;
+    text-align: left;
+}
