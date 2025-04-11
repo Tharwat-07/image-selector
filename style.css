@@ -9,10 +9,101 @@ body {
 
 h1 {
     color: #333;
+    margin-bottom: 10px; /* Adjust spacing */
 }
 
+/* Style for the toggle button container */
+.view-toggle {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#show-all-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #6f42c1; /* Purple */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+#show-all-button:hover {
+    background-color: #5a379b;
+}
+
+/* Main viewer section - default visible */
+#single-image-viewer {
+    display: flex; /* Use flex to arrange its children */
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Take full width */
+}
+
+/* Styles for the grid container */
+#all-images-grid {
+    display: grid;
+    /* Responsive grid: min 100px width, auto-fill columns */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px; /* Space between grid items */
+    width: 90%; /* Adjust width as needed */
+    max-width: 1200px; /* Max width */
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Styles for individual items in the grid */
+.grid-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px;
+    text-align: center;
+    background-color: #f9f9f9;
+    cursor: pointer; /* Indicate clickable */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.grid-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Styles for images within the grid */
+.grid-item img {
+    max-width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Remove extra space below */
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+/* Styles for code text within the grid */
+.grid-item p {
+    font-size: 13px;
+    color: #333;
+    margin: 0;
+    font-family: monospace;
+}
+
+
+/* Utility class to hide elements */
+.hidden {
+    display: none !important; /* Use !important to override other display rules */
+}
+
+/* Hide single viewer when grid is active */
+body.grid-view-active #single-image-viewer {
+    display: none;
+}
+
+
+/* --- Previous Styles (Containers, Buttons, Textarea) --- */
+/* Keep the necessary styles from the previous version */
+
 .image-container {
-    margin-bottom: 15px; /* Reduced bottom margin */
+    margin-bottom: 15px;
     text-align: center;
     background-color: #fff;
     padding: 15px;
@@ -34,18 +125,16 @@ h1 {
     color: #555;
 }
 
-/* Container for Nav buttons */
 .navigation-controls {
-    margin-bottom: 15px; /* Space below nav buttons */
+    margin-bottom: 15px;
     text-align: center;
 }
 
 .controls, .action-buttons {
-    margin-top: 0; /* Removed top margin from .controls */
+    margin-top: 0;
     text-align: center;
 }
 
-/* Shared button styles */
 .navigation-controls button,
 .controls button,
 .action-buttons button {
@@ -60,7 +149,6 @@ h1 {
     min-width: 120px;
 }
 
-/* Style for disabled state */
 .navigation-controls button:disabled,
 .controls button:disabled,
 .action-buttons button:disabled {
@@ -70,23 +158,19 @@ h1 {
 }
 
 
-/* Specific button colors */
-#prev-button, #next-button { background-color: #17a2b8; } /* Teal/Info */
+#prev-button, #next-button { background-color: #17a2b8; }
 #prev-button:hover:not(:disabled),
 #next-button:hover:not(:disabled) { background-color: #138496; }
 
-#yes-button { background-color: #28a745; } /* Green */
+#yes-button { background-color: #28a745; }
 #yes-button:hover:not(:disabled) { background-color: #218838; }
-#no-button { background-color: #dc3545; } /* Red */
+#no-button { background-color: #dc3545; }
 #no-button:hover:not(:disabled) { background-color: #c82333; }
 
-/* #undo-button style removed */
-
-#copy-button { background-color: #007bff; } /* Blue/Primary */
+#copy-button { background-color: #007bff; }
 #copy-button:hover:not(:disabled) { background-color: #0056b3; }
-#download-txt-button { background-color: #6c757d; } /* Gray/Secondary */
+#download-txt-button { background-color: #6c757d; }
 #download-txt-button:hover:not(:disabled) { background-color: #5a6268; }
-
 
 .selected-codes {
     margin-top: 20px;

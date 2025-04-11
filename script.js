@@ -10,32 +10,31 @@ for (let i = 1; i <= totalImages; i++) {
 // -------------------------------------------------------------
 
 // --- الحصول على عناصر الصفحة ---
+const pageBody = document.getElementById('page-body');
+const singleImageViewer = document.getElementById('single-image-viewer');
 const imageElement = document.getElementById('current-image');
 const sequenceElement = document.getElementById('image-sequence');
 const codeDisplayElement = document.getElementById('image-code-display');
-// --- أزرار التحكم ---
 const yesButton = document.getElementById('yes-button');
 const noButton = document.getElementById('no-button');
-// --- أزرار التنقل ---
 const prevButton = document.getElementById('prev-button');
 const nextButton = document.getElementById('next-button');
-// --- منطقة الأكواد ---
 const selectedCodesTextarea = document.getElementById('selected-codes-textarea');
-// --- أزرار العمل ---
 const copyButton = document.getElementById('copy-button');
 const downloadTxtButton = document.getElementById('download-txt-button');
-// --- تم حذف زر التراجع ومتغيراته ---
+// --- عناصر العرض المتعدد ---
+const showAllButton = document.getElementById('show-all-button');
+const allImagesGrid = document.getElementById('all-images-grid');
 
 // --- متغيرات لتتبع الحالة ---
 let currentImageIndex = 0;
-let currentSequenceNumber = 1; // يمثل الرقم الظاهر للمستخدم
+let currentSequenceNumber = 1;
+let isGridView = false; // لتتبع حالة عرض الشبكة
 
-// --- وظيفة لعرض الصورة الحالية وتحديث حالة الأزرار ---
+// --- وظيفة لعرض الصورة الحالية (في العارض الفردي) ---
 function displayCurrentImage() {
-    // Check if index is valid
     if (currentImageIndex >= 0 && currentImageIndex < imageData.length) {
         const currentImage = imageData[currentImageIndex];
-        // تحديث الرقم التسلسلي ليتوافق مع المؤشر (المؤشر يبدأ من 0)
         currentSequenceNumber = currentImageIndex + 1;
 
         imageElement.src = currentImage.url;
@@ -44,40 +43,33 @@ function displayCurrentImage() {
         codeDisplayElement.textContent = currentImage.code;
         imageElement.style.display = 'block';
 
-        // تمكين أزرار Yes/No دائما طالما هناك صورة معروضة
         yesButton.disabled = false;
         noButton.disabled = false;
-
-        // تمكين/تعطيل أزرار التنقل
         prevButton.disabled = (currentImageIndex === 0);
         nextButton.disabled = (currentImageIndex === imageData.length - 1);
 
-        // Preload next/prev image (optional optimization)
         if (currentImageIndex + 1 < imageData.length) {
-            const nextImg = new Image();
-            nextImg.src = imageData[currentImageIndex + 1].url;
+            const nextImg = new Image(); nextImg.src = imageData[currentImageIndex + 1].url;
         }
         if (currentImageIndex > 0) {
-             const prevImg = new Image();
-             prevImg.src = imageData[currentImageIndex - 1].url;
+             const prevImg = new Image(); prevImg.src = imageData[currentImageIndex - 1].url;
         }
-
     } else {
-        // Handle out-of-bounds index - shouldn't normally happen with disabled buttons
-        // but good practice to have a fallback.
-        // Could display a "No image" message or revert to a valid index.
-        // For now, just log an error and potentially disable everything.
         console.error("Attempted to display image at invalid index:", currentImageIndex);
-        imageElement.style.display = 'none';
-        sequenceElement.textContent = "-";
-        codeDisplayElement.textContent = "-";
-        yesButton.disabled = true;
-        noButton.disabled = true;
-        prevButton.disabled = true;
-        nextButton.disabled = true;
+        // Handle gracefully, maybe show first image if index is invalid
+        if(imageData.length > 0) {
+            currentImageIndex = 0;
+            displayCurrentImage(); // Try displaying the first image
+        } else {
+            // No images at all
+            imageElement.style.display = 'none';
+            sequenceElement.textContent = "-";
+            codeDisplayElement.textContent = "-";
+            yesButton.disabled = true; noButton.disabled = true;
+            prevButton.disabled = true; nextButton.disabled = true;
+        }
     }
-
-    // تعطيل أزرار النسخ والتحميل إذا كان مربع النص فارغًا
+    // Update action buttons state regardless
     const codesExist = selectedCodesTextarea.value.trim() !== '';
     copyButton.disabled = !codesExist;
     downloadTxtButton.disabled = !codesExist;
@@ -85,76 +77,129 @@ function displayCurrentImage() {
 
 // --- وظيفة للانتقال للصورة التالية (تستخدمها أزرار Yes/No) ---
 function advanceToNextImageForSelection() {
-    // هذه الوظيفة خاصة بـ Yes/No وتتعامل مع الوصول لنهاية القائمة
     currentImageIndex++;
     if (currentImageIndex >= imageData.length) {
-        // وصلنا للنهاية بعد ضغط Yes/No على آخر صورة
         imageElement.style.display = 'none';
         sequenceElement.textContent = "-";
         codeDisplayElement.textContent = "-";
         alert("All images have been processed!");
         yesButton.disabled = true;
         noButton.disabled = true;
-        // أزرار التنقل تبقى ممكنة إذا لم تكن على الحواف
-        prevButton.disabled = (currentImageIndex <= 0); // Should be true if length > 0
-        nextButton.disabled = true; // Definitely disabled
+        prevButton.disabled = (currentImageIndex <= 0);
+        nextButton.disabled = true;
     } else {
-        // إذا لم نصل للنهاية، فقط عرض الصورة التالية
         displayCurrentImage();
     }
-     // تعطيل أزرار النسخ والتحميل إذا كان مربع النص فارغًا
     const codesExist = selectedCodesTextarea.value.trim() !== '';
     copyButton.disabled = !codesExist;
     downloadTxtButton.disabled = !codesExist;
 }
 
+// --- وظيفة لملء شبكة الصور ---
+function populateImageGrid() {
+    allImagesGrid.innerHTML = ''; // Clear previous grid content
+
+    imageData.forEach((imgData, index) => {
+        // Create grid item container
+        const gridItem = document.createElement('div');
+        gridItem.classList.add('grid-item');
+        gridItem.dataset.index = index; // Store index for click handling
+
+        // Create image element
+        const img = document.createElement('img');
+        img.src = imgData.url;
+        img.alt = `Image ${index + 1} - Code: ${imgData.code}`;
+        img.loading = 'lazy'; // Lazy load images in the grid
+
+        // Create code paragraph
+        const codeP = document.createElement('p');
+        codeP.textContent = imgData.code;
+
+        // Append image and code to grid item
+        gridItem.appendChild(img);
+        gridItem.appendChild(codeP);
+
+        // Add click listener to grid item
+        gridItem.addEventListener('click', () => {
+            const clickedIndex = parseInt(gridItem.dataset.index, 10);
+            currentImageIndex = clickedIndex; // Update main viewer index
+            displayCurrentImage(); // Show the clicked image in the main viewer
+            // Switch back to single view after clicking
+            toggleGridView(false); // Force hide grid view
+        });
+
+        // Append grid item to the grid container
+        allImagesGrid.appendChild(gridItem);
+    });
+}
+
+// --- وظيفة لتبديل عرض الشبكة/العارض الفردي ---
+// Takes an optional 'forceState' (true = show grid, false = show single)
+function toggleGridView(forceState = null) {
+    const showGrid = forceState !== null ? forceState : !isGridView;
+
+    if (showGrid) {
+        populateImageGrid(); // Fill the grid content
+        allImagesGrid.classList.remove('hidden');
+        pageBody.classList.add('grid-view-active'); // Hides single viewer via CSS
+        showAllButton.textContent = 'Hide All Images';
+        isGridView = true;
+    } else {
+        allImagesGrid.classList.add('hidden');
+        pageBody.classList.remove('grid-view-active'); // Shows single viewer
+        showAllButton.textContent = 'Show All Images';
+        isGridView = false;
+        // Ensure the correct image is displayed when switching back
+        displayCurrentImage();
+    }
+}
 
 // --- ربط الأحداث بالأزرار ---
 
-// Yes Button - Add code and ADVANCE
+// Yes Button
 yesButton.addEventListener('click', () => {
     if (currentImageIndex < imageData.length) {
         const currentImageCode = imageData[currentImageIndex].code;
         const textarea = selectedCodesTextarea;
-
         if (textarea.value.trim() === '') {
             textarea.value = currentImageCode;
         } else {
             textarea.value += '-' + currentImageCode;
         }
-        // Use the dedicated advance function for Yes/No
         advanceToNextImageForSelection();
     }
 });
 
-// No Button - Skip and ADVANCE
+// No Button
 noButton.addEventListener('click', () => {
     if (currentImageIndex < imageData.length) {
-        // Use the dedicated advance function for Yes/No
         advanceToNextImageForSelection();
     }
 });
 
-// Previous Image Button - Just navigate
+// Previous Image Button
 prevButton.addEventListener('click', () => {
     if (currentImageIndex > 0) {
-        currentImageIndex--; // فقط نقص المؤشر
-        displayCurrentImage(); // واعرض الصورة في هذا المؤشر
+        currentImageIndex--;
+        displayCurrentImage();
     }
 });
 
-// Next Image Button - Just navigate
+// Next Image Button
 nextButton.addEventListener('click', () => {
     if (currentImageIndex < imageData.length - 1) {
-        currentImageIndex++; // فقط زد المؤشر
-        displayCurrentImage(); // واعرض الصورة في هذا المؤشر
+        currentImageIndex++;
+        displayCurrentImage();
     }
 });
 
+// Show/Hide All Button
+showAllButton.addEventListener('click', () => {
+    toggleGridView(); // Toggle the view state
+});
 
-// --- وظائف الأزرار الأخرى (Copy, Download) ---
 
-// Copy Button
+// --- وظائف الأزرار الأخرى (Copy, Download) --- unchanged ---
 copyButton.addEventListener('click', () => {
     const codesToCopy = selectedCodesTextarea.value;
     if (codesToCopy) {
@@ -178,19 +223,17 @@ copyButton.addEventListener('click', () => {
     }
 });
 
-// Download TXT Button
 downloadTxtButton.addEventListener('click', () => {
     const textToSave = selectedCodesTextarea.value;
     if (!textToSave) {
         alert('No codes selected to download.');
         return;
     }
-
     const blob = new Blob([textToSave], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'selected_codes.txt'; // Filename
+    link.download = 'selected_codes.txt';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -198,4 +241,4 @@ downloadTxtButton.addEventListener('click', () => {
 });
 
 // --- عرض الصورة الأولى عند تحميل الصفحة ---
-displayCurrentImage();
+displayCurrentImage(); // Initial display in single view mode
